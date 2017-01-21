@@ -1,9 +1,18 @@
+{% extends 'indri/base.html' %}
+{% load bootstrap3 %}
+{% load static %}
+
+
+{% block content %}
+
 {% if product_list %}
-	<ul>
+	<div>
 		{% for p in product_list %}
-			<li> <a href="{% url 'indri:detail' p.id%}"> {{ p.productName }} </a></li>
+			<a href="{% url 'indri:detail' p.id%}"> {{ p.productName }} </a>
 		{% endfor %}
-	</ul>
+	</div>
 {% else %}
 	<p> No products available. </p>
 {% endif %}
+
+{% endblock %}
