@@ -1,0 +1,9 @@
+{% if product_list %}
+	<ul>
+		{% for p in product_list %}
+			<li> <a href="{% url 'indri:detail' p.id%}"> {{ p.productName }} </a></li>
+		{% endfor %}
+	</ul>
+{% else %}
+	<p> No products available. </p>
+{% endif %}
