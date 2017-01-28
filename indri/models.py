@@ -1,4 +1,5 @@
 from django.db import models
+import datetime
 
 # Create your models here.
 
@@ -27,8 +28,8 @@ class TestRun(models.Model):
 	tag 		= models.CharField(max_length = 256) 	# feature name tag, for. e.g. cleanup, vif etc.
 	mean 		= models.DecimalField(max_digits = 8, decimal_places = 2)
 	median 		= models.DecimalField(max_digits = 8, decimal_places = 2)
-	startTime	= models.DateTimeField()				# useful to automatically infer the build dates
-	endTime		= models.DateTimeField()
+	startTime	= models.DateTimeField(default = datetime.datetime.now)	# useful to automatically infer the build dates
+	endTime		= models.DateTimeField(default = datetime.datetime.now)
 	
 	class Meta:
 		abstract = True	# prevents this class from being converted into a table in the database
