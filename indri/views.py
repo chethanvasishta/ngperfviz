@@ -2,7 +2,9 @@ from django.shortcuts import render
 
 # Create your views here.
 from django.http import HttpResponse, HttpResponseNotFound
-from indri.models import Product, Release, Build
+from indri.models import Product, Release, Build, RunTimeTestRun, CompileTimeTestRun
+from django.views.decorators.csrf import csrf_exempt
+from indri.serializers import RunTimeTestSerializer
 
 def index(request):
 	products = Product.objects.all()
@@ -10,12 +12,13 @@ def index(request):
 	return render(request, 'indri/index.html', context)
 
 def detail(request, product_id):
-	releases = Release.objects.all(id = product_id)
+	releases = Release.objects.filter(pk = product_id)
 	response = ''
 	for r in releases:
 		response += r.releaseName + "\n"
 	return HttpResponse(response)
-	
+
+@csrf_exempt	
 def upload(request, productName, releaseName = "", buildStr=""):
 
 	if request.method != 'POST':
@@ -37,5 +40,13 @@ def upload(request, productName, releaseName = "", buildStr=""):
 	except Build.DoesNotExist:
 		build = Build.objects.create(buildID = buildStr, release = release)
 	
-	response = "Product Name : %s, ID = %s, releaseName = %s, ID = %s, buildStr = %s, ID = %s" %(productName, product.pk, releaseName, release.pk, buildStr, build.pk)
+	serializer = RunTimeTestSerializer (data = request.POST, context = {"build" : build})
+	if serializer.is_valid():
+		serializer.save()
+		response = "Test saved. Test:%s. Product Name : %s, ID = %s, releaseName = %s, ID = %s, buildStr = %s, ID = %s" %(serializer, productName, product.pk, releaseName, release.pk, buildStr, build.pk)
+		print("Data uploaded successfully")
+	else:
+		response = "Invalid data" # TODO: Be clear about the error
+		print("Data upload failed : %s", serializer.errors)
+		return HttpResponseNotFound(response)
 	return HttpResponse(response)
